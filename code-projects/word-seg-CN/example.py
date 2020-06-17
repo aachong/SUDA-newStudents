@@ -76,15 +76,21 @@ def evaluate(targets, results):
             while diff > 0:
                 word_r = next(it_r)
                 diff -= len(word_r)
+                print(word_r,word_t,sep=' ')
         if diff < 0:
             while diff < 0:
                 word_t = next(it_t)
                 diff += len(word_t)
+                print(word_r,word_t,sep=' ')
     return right,number_t,number_r
 
 right, number_t, number_r = evaluate(targets,results)
 print(right,number_t,number_r,sep=' ')
-print('召回率',right/number_t,sep='=')
-print('准确率',right/number_r,sep='=')
-print('F值',right/number_r,sep='=')
+precision = right/number_r
+recall = right/number_t
+F = precision*recall*2/(precision+recall)
+
+print('召回率',precision,sep='=')
+print('准确率',recall,sep='=')
+print('F值',F,sep='=')
 
