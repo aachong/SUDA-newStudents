@@ -2,15 +2,10 @@ def load_data(file):
     with open(file, 'r', encoding='utf-8') as f:
         return [lines.strip() for lines in f]
 
-
 sentences = load_data('textCN.txt')
 targets = load_data('textCN.gold')
 dicts = load_data('CN.dict')
 dicts = {w: 0 for w in dicts[1:]}
-sentences[-4:]
-targets[-4:]
-dicts
-
 
 def participle(sentences):
     words = []
@@ -48,9 +43,7 @@ def lens(s):
             count += 1
     return count
 
-
 print(lens(results))
-
 
 def evaluate(targets, results):
     right, number_t, number_r = 0, 0, 0
@@ -90,7 +83,7 @@ precision = right/number_r
 recall = right/number_t
 F = precision*recall*2/(precision+recall)
 
-print('召回率',precision,sep='=')
-print('准确率',recall,sep='=')
+print('召回率',recall,sep='=')
+print('准确率',precision,sep='=')
 print('F值',F,sep='=')
 
