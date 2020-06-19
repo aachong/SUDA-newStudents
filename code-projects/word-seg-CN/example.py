@@ -28,9 +28,22 @@ def participle(sentences):
         c += 1
     return words
 
+#------------------
+
+import jieba
+par_sentence_jieba = []
+for i in sentences:
+    p_sen = jieba.cut(i)
+    par_sentence_jieba.append(' '.join(list(p_sen)))
+
+#------------------
+
+
 
 par_sentence = participle(sentences)
-results = ' '.join(par_sentence)
+
+
+results = ' '.join(par_sentence_jieba)
 targets = ' '.join(targets)
 print(targets[:100])
 print(results[:100])
