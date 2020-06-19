@@ -23,7 +23,7 @@
 
 实现语言：Python and (C++ or Java)
 
-* [英文单词词频统计并按次数排序](code-projects/word-count-EN/word-count-EN.md)
+* [英文单词词频统计并按次数排序](code-projects/word-count-EN/)
 
 * [中文文本字频统计(UTF8)](code-projects/ch-count-CN/ch-count-CN.md)
 
@@ -34,11 +34,11 @@
 
 实现语言：Python or C++ or Java or 基于现有工具
 
-* [文本分类（学习基本分类算法）](nlp-projects/text-classification/text-classification.md)
+* [文本分类（学习基本分类算法）](nlp-projects/text-classification)
 
 * 分词（基于分类器的分词）
 
-* [命名实体识别NER](nlp-projects/named-entity-recognition/ner.md)
+* [命名实体识别NER](nlp-projects/named-entity-recognition)
 
 * CKY-依存分析
 
