@@ -8,6 +8,7 @@ import numpy as np
 MAX_WORD_SIZE = 60000
 BATCH_SIZE = 64
 
+
 def load_data(filename):
     x, y = [], []
     with open(filename, 'r', encoding='utf-8') as f:
@@ -44,32 +45,57 @@ label2index = {w: i for i, w in enumerate(index2label)}
 
 def encode(train_input, train_output, word2index, label2index):
 
-    train_input1 = [[word2index.get(w, 1) for w in i.split(' ')] for i in train_input]
-    train_output1 = [[label2index.get(w, 1) for w in i.split(' ')] for i in train_output]
+    train_input1 = [[word2index.get(w, 1)
+                     for w in i.split(' ')] for i in train_input]
+    train_output1 = [[label2index.get(w, 1)
+                      for w in i.split(' ')] for i in train_output]
 
-    sorted_index = sorted(range(len(train_input1)),key=lambda x:len(train_input1[x]))
+    sorted_index = sorted(range(len(train_input1)),
+                          key=lambda x: len(train_input1[x]))
     out_input = [train_input1[i] for i in sorted_index]
     out_output = [train_output1[i] for i in sorted_index]
-    return out_input,out_output
+    return out_input, out_output
 
-train_in,train_out = encode(train_input, train_output, word2index, label2index)
+
+train_in, train_out = encode(
+    train_input, train_output, word2index, label2index)
 print(' '.join([index2word[i] for i in train_in[1000]]))
 print(' '.join([index2label[i] for i in train_out[1000]]))
 
-def get_batch_index(n,batch_index_size):
-    idx_list = np.arange(0,n,batch_index_size)
+
+def get_batch_index(n, batch_index_size):
+    idx_list = np.arange(0, n, batch_index_size)
     np.random.shuffle(idx_list)
     batch_index = []
     for i in idx_list:
-        batch_index.append(np.arange(i,min(batch_index_size+i,n)).tolist())
-    return batch_index 
+        batch_index.append(np.arange(i, min(batch_index_size+i, n)).tolist())
+    return batch_index
 
-def get_batch(train_in,train_out,batch_size):
-    batches_index = get_batch_index(len(train_in),batch_size)
+
+def process_data(sentences, label):
+    lens = [len(s) for s in sentences]
+    n = len(sentences)
+    max_len = np.max(lens)
+
+    out = np.zeros((n, max_len)).astype('int32')
+    for i in range(n):
+        out[i, :lens[i]] = sentences[i]
+    return out, np.array(lens).astype('int32'), np.array(label).astype('int32')
+
+
+def get_batch(train_in, train_out, batch_size):
+    batches_index = get_batch_index(len(train_in), batch_size)
     batches_data = []
     for batch in batches_index:
-        batches_data.append([(train_in[i],train_out[i],len(train_in[i])) for i in batch])
+        sentences = [train_in[i]for i in batch]
+        labal = [train_out[i][0] for i in batch]
+        batches_data.append(process_data(sentences, labal))
     return batches_data
+
+
 # [(train_in[i],train_out[i]) for i in range(3)]
-train_data = get_batch(train_in,train_out,BATCH_SIZE)
-print(train_data[0])
+train_data = get_batch(train_in, train_out, BATCH_SIZE)
+
+_ = torch.randn(2,5,3,4)
+_ = _.transpose(0,3)
+_.size()
