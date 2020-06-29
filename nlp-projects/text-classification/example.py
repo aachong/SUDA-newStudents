@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 
+
 MAX_WORD_SIZE = 60000
 BATCH_SIZE = 64
 
@@ -95,7 +96,22 @@ def get_batch(train_in, train_out, batch_size):
 
 # [(train_in[i],train_out[i]) for i in range(3)]
 train_data = get_batch(train_in, train_out, BATCH_SIZE)
+# batch，句子，句子长度，标签
 
-_ = torch.randn(2,5,3,4)
-_ = _.transpose(0,3)
-_.size()
+
+class avgModule(nn.Module):
+    def __init__(avgModule,self,vocab_size,embedding_size,pad_idx,output_size):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size,embedding_size,pad_idx)
+        self.fc = nn.Linear(embedding_size,output_size)
+
+    def forward(self,input):
+        # input : batch_size,1,vocab_size
+        input.squeeze_()
+        embeded = self.embedding(input) #b_size,vocab_size,embeding_size
+        avged = F.avg_pool2d(embeded,(embeded[1],1))
+
+
+a = torch.randn(5,4,3)
+b = F.avg_pool2d(a,(a.shape[1],1))
+b.shape
