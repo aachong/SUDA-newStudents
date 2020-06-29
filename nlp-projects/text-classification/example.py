@@ -8,6 +8,7 @@ import numpy as np
 
 MAX_WORD_SIZE = 60000
 BATCH_SIZE = 64
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def load_data(filename):
@@ -100,18 +101,58 @@ train_data = get_batch(train_in, train_out, BATCH_SIZE)
 
 
 class avgModule(nn.Module):
-    def __init__(avgModule,self,vocab_size,embedding_size,pad_idx,output_size):
-        super().__init__()
-        self.embedding = nn.Embedding(vocab_size,embedding_size,pad_idx)
-        self.fc = nn.Linear(embedding_size,output_size)
+    def __init__(self, vocab_size, embedding_size, pad_idx, output_size):
+        super(avgModule, self).__init__()
+        self.embedding = nn.Embedding(vocab_size, embedding_size, pad_idx)
+        self.fc = nn.Linear(embedding_size, output_size)
 
-    def forward(self,input):
-        # input : batch_size,1,vocab_size
-        input.squeeze_()
-        embeded = self.embedding(input) #b_size,vocab_size,embeding_size
-        avged = F.avg_pool2d(embeded,(embeded[1],1))
+    def forward(self, input):
+        # input : batch_size,vocab_size
+        print(input.shape)
+        embeded = self.embedding(input)  # b_size,vocab_size,embeding_size
+        print(embeded.shape)
+        pooled = F.avg_pool2d(embeded, (embeded[1], 1)).squeeze()
+        return F.log_softmax(self.fc(pooled))
 
 
-a = torch.randn(5,4,3)
-b = F.avg_pool2d(a,(a.shape[1],1))
-b.shape
+vocab_size = MAX_WORD_SIZE
+embedding_size = 100
+pad_idx = 0
+output_size = 5
+model = avgModule(vocab_size, embedding_size, pad_idx, output_size).to(device)
+
+criterion = nn.CrossEntropyLoss().to(device)
+
+optimizer = optim.Adam(model.parameters())
+
+train_data[0][2]
+
+
+def accuracy(preds, y):
+    f_preds = preds.max(1)[1]
+    correct = (f_preds == y).float()
+    acc = sum(correct)/len(correct)
+    return acc
+
+
+def train(model, criterion, optimizer, data):
+    epochs = 20
+    for epoch in range(epochs):
+        epoch_loss = 0
+        epoch_acc = 0
+        for (x, length, y) in data:
+            x = torch.from_numpy(x).long().to(device)
+            y = torch.from_numpy(y).long().to(device)
+            preds = model(x)
+            
+            loss = criterion(preds, y)
+            acc = accuracy(preds, y)
+            
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss
+            epoch_acc += acc
+        print(f'Epoch:{epoch},精准度:{epoch_acc/len(data)},loss:{epoch_loss/len(data)}')
+
+train(model, criterion, optimizer, train_data)
