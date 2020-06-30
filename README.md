@@ -25,9 +25,9 @@
 
 * [英文单词词频统计并按次数排序](code-projects/word-count-EN/)
 
-* [中文文本字频统计(UTF8)](code-projects/ch-count-CN/ch-count-CN.md)
+* [中文文本字频统计(UTF8)](code-projects/ch-count-CN/)
 
-* [中文文本正向最大匹配分词(UTF8)](code-projects/word-seg-CN/word-seg-CN.md)
+* [中文文本正向最大匹配分词(UTF8)](code-projects/word-seg-CN/)
 
 
 ## NLP Projects (with NLP course)  (To add)
