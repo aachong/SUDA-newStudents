@@ -64,6 +64,8 @@ train_in, train_out = encode(
 print(' '.join([index2word[i] for i in train_in[1000]]))
 print(' '.join([index2label[i] for i in train_out[1000]]))
 
+test_in,test_out = encode(test_input,test_output,word2index,label2index)
+
 
 def get_batch_index(n, batch_index_size):
     idx_list = np.arange(0, n, batch_index_size)
@@ -98,20 +100,22 @@ def get_batch(train_in, train_out, batch_size):
 # [(train_in[i],train_out[i]) for i in range(3)]
 train_data = get_batch(train_in, train_out, BATCH_SIZE)
 # batch，句子，句子长度，标签
-
+test_data = get_batch(test_in,test_out,BATCH_SIZE)
+len(test_data[0])
 
 class avgModule(nn.Module):
     def __init__(self, vocab_size, embedding_size, pad_idx, output_size):
         super(avgModule, self).__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_size, pad_idx)
         self.fc = nn.Linear(embedding_size, output_size)
+        self.dropout = nn.Dropout(0.2)
 
     def forward(self, input):
         # input : batch_size,vocab_size
-        print(input.shape)
+
         embeded = self.embedding(input)  # b_size,vocab_size,embeding_size
-        print(embeded.shape)
-        pooled = F.avg_pool2d(embeded, (embeded[1], 1)).squeeze()
+        embeded = self.dropout(embeded)
+        pooled = F.avg_pool2d(embeded, (len(embeded[1]), 1)).squeeze()
         return F.log_softmax(self.fc(pooled))
 
 
@@ -136,7 +140,7 @@ def accuracy(preds, y):
 
 
 def train(model, criterion, optimizer, data):
-    epochs = 20
+    epochs = 25
     for epoch in range(epochs):
         epoch_loss = 0
         epoch_acc = 0
@@ -153,6 +157,25 @@ def train(model, criterion, optimizer, data):
             optimizer.step()
             epoch_loss += loss
             epoch_acc += acc
+        with torch.no_grad():
+            evaluate(model,criterion,test_data)
         print(f'Epoch:{epoch},精准度:{epoch_acc/len(data)},loss:{epoch_loss/len(data)}')
 
 train(model, criterion, optimizer, train_data)
+
+def evaluate(model,criterion,data):
+    epoch_acc = 0.0
+    epoch_loss = 0.0
+    for (x,length,y) in data:
+        x = torch.from_numpy(x).long().to(device)
+        y = torch.from_numpy(y).long().to(device)
+        preds = model(x)
+
+        loss = criterion(preds,y)
+        acc = accuracy(preds,y)
+        epoch_acc += acc
+        epoch_loss += loss
+    print(f'测试集：准确率:{epoch_acc/len(data)},loss:{epoch_loss/len(data)}')
+
+evaluate(model,criterion,test_data)
+        
