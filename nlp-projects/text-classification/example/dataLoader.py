@@ -21,8 +21,8 @@ def load_data(filename):
     return x, y
 
 
-train_input, train_output = load_data('train.txt')
-test_input, test_output = load_data('test.txt')
+train_input, train_output = load_data('../train.txt')
+test_input, test_output = load_data('../test.txt')
 
 print(f'输入:{train_input[3][:20]},输出:{train_output[3]}')
 print(f'输入:{test_input[3][:20]},输出:{test_output[3]}')

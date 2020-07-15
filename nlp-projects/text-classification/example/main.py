@@ -12,7 +12,7 @@ test_data = dataLoader.test_data
 vocab_size = dataLoader.MAX_WORD_SIZE
 index2label = dataLoader.index2label
 index2word = dataLoader.index2word
-embedding_size = 100
+embedding_size = 128
 pad_idx = 0
 output_size = 5
 
@@ -75,7 +75,17 @@ model.load_state_dict(torch.load('avgModel.pt'))
 
 evaluate(model,criterion,test_data)
 
+it = iter(model.parameters())
+para = next(it)
 
+
+import plotly.graph_objects as go
+import numpy as np
+para1 = para.detach().cpu().numpy()
+para = para1[:4,:]
+sur = go.Surface(z=para)
+fig = go.Figure(sur)
+fig.show()
 
 tensor2 =  torch.tensor(test_data[0][0][:3]).long().to(device)
 pred = model(tensor2)

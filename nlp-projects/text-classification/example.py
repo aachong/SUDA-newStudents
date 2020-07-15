@@ -140,19 +140,29 @@ def accuracy(preds, y):
     acc = sum(correct)/len(correct)
     return acc
 
-def evaluate(model,criterion,data):
+from tensorboardX import SummaryWriter
+
+writer = SummaryWriter('runs/exp')
+def evaluate(model,criterion,data,epoch):
     epoch_acc = 0.0
     epoch_loss = 0.0
+    xx =  -1
     for (x,length,y) in data:
         x = torch.from_numpy(x).long().to(device)
         y = torch.from_numpy(y).long().to(device)
+        print(x.shape)
         preds = model(x)
-
+        # if(xx==-1):
+        #     writer.add_graph(model,input_to_model=x)
+        #     xx=1
         loss = criterion(preds,y)
         acc = accuracy(preds,y)
         epoch_acc += acc
         epoch_loss += loss
+    writer.add_scalar('loss',epoch_loss/len(data),epoch)
+    writer.add_scalar('acc',epoch_acc/len(data),epoch)
     print(f'测试集：准确率:{epoch_acc/len(data)},loss:{epoch_loss/len(data)}')
+
 
 
 def train(model, criterion, optimizer, data):
@@ -174,13 +184,20 @@ def train(model, criterion, optimizer, data):
             epoch_loss += loss
             epoch_acc += acc
         with torch.no_grad():
-            evaluate(model,criterion,test_data)
+            model.eval()
+            evaluate(model,criterion,test_data,epoch)
+            model.train()
         print(f'Epoch:{epoch},精准度:{epoch_acc/len(data)},loss:{epoch_loss/len(data)}')
+
+
+
+
+
 
 train(model, criterion, optimizer, train_data)
 
 
-evaluate(model,criterion,test_data)
+evaluate(model,criterion,test_data,2)
 
 [index2word[i] for i in test_data[0][0][1]] 
 tensor1 = torch.tensor(test_data[0][0][1]).long().cuda()
@@ -198,3 +215,9 @@ F.max_pool2d(t1,(3,1))
 
 t2 = torch.ones(3,4)
 t1+t2
+
+index2word[100:800]
+it = iter(model.parameters())
+i = next(it)
+
+writer.add_embedding(mat=i[100:800],metadata=index2word[100:800],global_step=1)
