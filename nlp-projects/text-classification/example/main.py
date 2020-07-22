@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
+from utils import LabelSmoothing
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -17,7 +18,12 @@ pad_idx = 0
 output_size = 5
 
 model = avgModule.avgModule(vocab_size, embedding_size, pad_idx, output_size).to(device)
+
+# for p in model.parameters():
+#         if p.dim() > 1:
+#             nn.init.xavier_uniform(p)
 criterion = nn.CrossEntropyLoss().to(device)
+# criterion = LabelSmoothing().to(device)
 optimizer = optim.Adam(model.parameters())
 train_data[0][2]
 
@@ -63,7 +69,9 @@ def train(model, criterion, optimizer, data):
             epoch_loss += loss
             epoch_acc += acc
         with torch.no_grad():
+            model.eval()
             tmp = evaluate(model,criterion,test_data)
+            model.train()
             if(tmp>maxv):
                 maxv = tmp
                 torch.save(model.state_dict(),'avgModel.pt')
@@ -77,26 +85,3 @@ evaluate(model,criterion,test_data)
 
 it = iter(model.parameters())
 para = next(it)
-
-
-import plotly.graph_objects as go
-import numpy as np
-para1 = para.detach().cpu().numpy()
-para = para1[:4,:]
-sur = go.Surface(z=para)
-fig = go.Figure(sur)
-fig.show()
-
-tensor2 =  torch.tensor(test_data[0][0][:3]).long().to(device)
-pred = model(tensor2)
-a = [index2label[i] for i in pred.max(1)[1]]
-b = [index2label[i] for i in test_data[0][2][:3]]
-ss = []
-for s in test_data[0][0][:3]:
-    ss.append(''.join([index2word[i] for i in s]))
-ss
-for i in zip(ss,a,b):
-    print(i)
-
-
-
