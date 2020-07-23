@@ -44,8 +44,7 @@ def get():
     LABEL.build_vocab(train_dataset)
     # 构造iter
     # x_iter,t_iter = data.BucketIterator.splits((train_dataset,test_dataset), (64,64),device='cuda',sort_key=lambda x: x.text)
-    # len(TEXT.vocab.itos)
     return data.BucketIterator.splits((train_dataset,test_dataset), (64,64),device='cuda',sort_key=lambda x: x.text)
-    # next(iter(t_iter)).text
+
 
 

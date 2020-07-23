@@ -21,7 +21,7 @@ model = avgModule.avgModule(
 for p in model.parameters():
         if p.dim() > 1:
             nn.init.xavier_uniform(p)
-criterion = nn.CrossEntropyLoss().to(device)
+# criterion = nn.CrossEntropyLoss().to(device)
 criterion = LabelSmoothing().to(device)
 optimizer = optim.Adam(model.parameters())
 
@@ -88,5 +88,3 @@ model.load_state_dict(torch.load('avgModel2.pt'))
 model.eval()
 evaluate(model, criterion, test_data)
 
-it = iter(model.parameters())
-para = next(it)
